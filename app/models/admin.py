@@ -20,7 +20,7 @@ class Admin(Model):
 			.where(Field("admin_id") == self.id)
 		
 		if accepted is not None:
-			sub_select = sub_select.where(Field("accepted") == accepted)
+			sub_select = sub_select.where(Field("accepted") == int(accepted))
 		
 		q = Query.from_(agent.Agent._table).select("*") \
 			.where(Field("id").isin(sub_select))

@@ -6,7 +6,6 @@ class AdminAgent(Model):
 
 	_table = "admin_agents"
 
-	_fields = ("admin_id", "agent_id", "invited_at", "accepted")
-
+	_fields = ("id", "admin_id", "agent_id", "invited_at", "accepted")
 
 

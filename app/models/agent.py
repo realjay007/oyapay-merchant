@@ -21,7 +21,7 @@ class Agent(Model):
 			.where(Field("agent_id") == self.id)
 		
 		if accepted is not None:
-			sub_select = sub_select.where(Field("accepted") == accepted)
+			sub_select = sub_select.where(Field("accepted") == int(accepted))
 		
 		q = Query.from_(admin.Admin._table).select("*") \
 			.where(Field("id").isin(sub_select))
