@@ -1,1 +1,1 @@
-# oyapay-merchant
+# Oyapay merchant
