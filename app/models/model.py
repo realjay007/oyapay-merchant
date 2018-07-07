@@ -51,6 +51,8 @@ class Model:
 			q = Query.into(self._table).columns(*keys).insert(*values)
 			cur.execute(q.get_sql())
 			self.id = cur.lastrowid
+			# Sync to get table defaults
+			self.init_data(Model.find_one(self.id))
 		self._db.commit()
 
 		return self
