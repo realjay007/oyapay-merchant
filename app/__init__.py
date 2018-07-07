@@ -30,5 +30,8 @@ def create_app(test_config=None):
 	
 	from . import db
 	db.init_app(app)
+
+	from .controllers import api
+	app.register_blueprint(api.bp)
 	
 	return app
