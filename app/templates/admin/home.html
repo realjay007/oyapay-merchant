@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<header class="mt-3 mt-md-5 mb-3 mb-md-5 clearfix">
+	<h2 class="float-left">Agents</h2>
+	<div class="float-right">
+		<a href="{{ url_for('admin.invite') }}" class="btn btn-light">Invite Agent</a>
+		<a href="{{ url_for('admin.logout') }}" class="btn btn-light">Logout</a>
+	</div>
+</header>
+{% endblock %}
+
+{% block content %}
+<table class="table">
+	<thead>
+		<tr>
+			<th>Name</th>
+			<th>Phone</th>
+			<th>Confirmed</th>
+			<th>Invited at</th>
+			<th>Actions</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>Jane Doe</td>
+			<td>08123456789</td>
+			<td>Yes</td>
+			<td>July 8, 2018 10:30am</td>
+			<td>
+				<button class="btn btn-danger btn-sm">Remove</button>
+			</td>
+		</tr>
+	</tbody>
+</table>
+{% endblock %}

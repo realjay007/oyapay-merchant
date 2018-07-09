@@ -16,6 +16,18 @@ class Admin(Model):
 		""" Get agents under admin
 				set accepted to True to return only agents with accepted invites, false for non-accepted
 		"""
+		# Get invites
+		q = Query.from_(admin_agent.AdminAgent._table).select("*") \
+			.where(Field("admin_id") == self.id)
+		if accepted is not None:
+			q = q.where(Field("accepted") == int(accepted))
+		raw_invites = self._db.execute(q.get_sql())
+		invites = {}
+		if raw_invites is not None:
+			for raw_invite in raw_invites:
+				invites[raw_invite["agent_id"]] = admin_agent.AdminAgent(raw_invite)
+
+		# Get agents
 		sub_select = Query.from_(admin_agent.AdminAgent._table).select("agent_id") \
 			.where(Field("admin_id") == self.id)
 		
@@ -26,11 +38,12 @@ class Admin(Model):
 			.where(Field("id").isin(sub_select))
 		
 		raw_agents = self._db.execute(q.get_sql())
-		
 		agents = []
 		if raw_agents is not None:
 			for raw_agent in raw_agents:
-				agents.append(agent.Agent(raw_agent))
+				ag = agent.Agent(raw_agent)
+				ag.invite = invites[ag.id]
+				agents.append(ag)
 		
 		return agents
 	
