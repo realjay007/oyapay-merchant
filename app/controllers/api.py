@@ -9,6 +9,9 @@ import simplejson
 from ..models import (
 	Admin, Agent, AdminAgent
 )
+from ..libraries import (
+	validate
+)
 
 bp = Blueprint("api", __name__, url_prefix="/api")
 
@@ -21,6 +24,9 @@ def json_response(output):
 @bp.route("/admins", methods=("POST",))
 def create_admin():
 	""" Create admin profile """
+	err = validate.validate_create_admin(request.form)
+	if err:
+		return validate.send_val_error_as_json(err)
 	data = {
 		"name": request.form.get("name"),
 		"phone": request.form.get("phone"),
@@ -99,6 +105,9 @@ def delete_admin(id):
 
 @bp.route("/agents", methods=("POST",))
 def create_agent():
+	err = validate.validate_create_agent(request.form)
+	if err:
+		return validate.send_val_error_as_json(err)
 	data = {
 		"name": request.form.get("name"),
 		"phone": request.form.get("phone"),
@@ -175,6 +184,9 @@ def delete_agent(id):
 
 @bp.route("/assoc", methods=("POST",))
 def create_assoc():
+	err = validate.validate_create_assoc(request.form)
+	if err:
+		return validate.send_val_error_as_json(err)
 	admin_id = request.form.get("admin_id")
 	agent_id = request.form.get("agent_id")
 
@@ -226,6 +238,20 @@ def get_admin_agents(id):
 	}
 	return json_response(output)
 
+@bp.route("/agent/<int:id>/admins", methods=("GET",))
+def get_agent_admins(id):
+	agent = Agent.find_one(id)
+
+	if agent is None:
+		return not_found("No agent with this id exists")
+	
+	admins = agent.get_admins()
+	output = {
+		"status": True,
+		"data": admins
+	}
+	return json_response(output)
+
 
 @bp.errorhandler(404)
 def not_found(error=None):
@@ -236,6 +262,3 @@ def not_found(error=None):
 	resp = jsonify(output)
 	resp.status_code = 404
 	return resp
-
-
-

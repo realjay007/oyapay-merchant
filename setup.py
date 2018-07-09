@@ -9,8 +9,6 @@ setup(
 	install_requires=[
 		"flask",
 		"simplejson",
-		"pypika",
-		"flask-responses"
+		"pypika"
 	]
 )
-

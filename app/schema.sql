@@ -18,6 +18,7 @@ CREATE TABLE agents (
 	phone TEXT NOT NULL,
 	password TEXT NOT NULL,
 	confirmed BOOLEAN DEFAULT 0,
+	confirm_code TEXT,
 	created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 

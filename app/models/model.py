@@ -59,7 +59,7 @@ class Model:
 			q = Query.update(self._table)
 			for key, value in data.items():
 				q = q.set(key, value)
-			q = q.where(Field("id") == self.id)
+			q = q.where(Field("id") == getattr(self, "id"))
 			sql = q.get_sql()
 			cur.execute(sql)
 		else:
@@ -121,4 +121,3 @@ class Model:
 			for obj in objs:
 				result.append(cls(obj))
 		return result
-
