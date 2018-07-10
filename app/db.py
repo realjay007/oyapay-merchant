@@ -15,7 +15,12 @@ def get_db():
 			check_same_thread=False
 		)
 		g.db.row_factory = lambda c, r: dict(zip([col[0] for col in c.description], r))
-	
+
+		# Run init_db if tables on db are less than 4
+		tables = g.db.execute("SELECT * FROM sqlite_master").fetchall()
+		if len(tables) < 4:
+			init_db()
+		
 	return g.db
 
 
