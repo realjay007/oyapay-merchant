@@ -122,7 +122,7 @@ def invite():
 			agent.save()
 			confirm_url = url_for("agent.confirm", code=agent.confirm_code)
 			app.logger.info("Agent conformation link ({0}): {1}\n".format(agent.phone, confirm_url))
-			msg = "Agent account created successfully. Check confirm link in logs."
+			msg = "Agent account created successfully. Confirm link: ${0}".format(confirm_url)
 		
 		invite = admin.get_invite(agent)
 		if invite is not None:
