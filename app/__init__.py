@@ -25,8 +25,9 @@ def create_app(test_config=None):
 	except OSError as os_error:
 		pass
 	
-	log_handler = RotatingFileHandler("merchant.log", maxBytes=1024000, backupCount=1)
-	log_handler.setLevel(logging.INFO)
+	log_file = os.path.join(app.instance_path, "merchant.log")
+	log_handler = RotatingFileHandler(log_file, maxBytes=1024000, backupCount=10)
+	log_handler.setLevel(logging.DEBUG)
 	app.logger.addHandler(log_handler)
 	
 	# a simple page that says hello
@@ -38,9 +39,9 @@ def create_app(test_config=None):
 	from . import db
 	db.init_app(app)
 
-	from .controllers import api, admin
+	from .controllers import api, admin, agent
 	app.register_blueprint(api.bp)
 	app.register_blueprint(admin.bp)
-
+	app.register_blueprint(agent.bp)
 	
 	return app

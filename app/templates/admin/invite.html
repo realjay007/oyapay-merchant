@@ -14,11 +14,11 @@
 <form class="mx-auto" style="max-width: 500px" action="{{ url_for('admin.invite') }}" method="POST">
 	<div class="form-group">
 		<label for="agent-name">Name</label>
-		<input type="text" class="form-control" id="agent-name" required>
+		<input type="text" class="form-control" id="agent-name" name="name"required>
 	</div>
 	<div class="form-group">
 		<label for="agent-phone">Phone</label>
-		<input type="text" class="form-control" id="agent-phone" required>
+		<input type="text" class="form-control" id="agent-phone" name="phone" required>
 	</div>
 	<button type="submit" class="btn btn-primary btn-lg btn-block w-50 mx-auto mt-5">Invite</button>
 </form>

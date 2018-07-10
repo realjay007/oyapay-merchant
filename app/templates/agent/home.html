@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<header class="mt-3 mt-md-5 mb-3 mb-md-5 clearfix">
+	<h2 class="float-left">Accepted Invitations</h2>
+	<div class="float-right">
+		<a href="{{ url_for('agent.pending') }}" class="btn btn-light">
+			Pending Invites
+			{% if invite_count %}
+			<span class="badge badge-pill badge-primary">{{ invite_count }}</span>
+			{% endif %}
+		</a>
+		<a href="{{ url_for('agent.login') }}" class="btn btn-light">Logout</a>
+	</div>
+</header>
+{% endblock %}
+
+{% block content %}
+<table class="table">
+	<thead>
+		<tr>
+			<th>Name</th>
+			<th>Phone</th>
+			<th>Business Name</th>
+			<th>Invited at</th>
+			<th>Actions</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for admin in admins %}
+		<tr>
+			<td>{{ admin.name }}</td>
+			<td>{{ admin.phone }}</td>
+			<td>{{ admin.biz_name }}</td>
+			<!-- <td>July 8, 2018 10:30am</td> -->
+			<td>{{ admin.invite.invited_at }}</td>
+			<td>
+				<button data-admin-id="{{ admin.id }}" class="btn btn-danger btn-sm remove-admin-btn">Remove</button>
+			</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+<!-- Remove admin Modal -->
+<div class="modal fade" id="remove-admin" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="exampleModalLabel">Remove agent</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					Are you sure you want to remove admin/business from your list?
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+					<button type="button" class="btn btn-primary" id="remove-admin-confirm">Yes</button>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}
+
+{% block script %}
+<script>
+$(function() {
+	var del_admin_id;
+	var del_admin_modal = $("#remove-admin");
+	var del_admin_url = "{{ url_for('agent.remove_admin') }}";
+	var home_url = "{{ url_for('agent.home') }}";
+	$(".remove-admin-btn").click(function() {
+		del_admin_id = $(this).data("admin-id");
+		del_admin_modal.modal("show")
+	});
+
+	$("#remove-admin-confirm").click(function() {
+		var data = {admin_id: del_admin_id};
+		$.post(del_admin_url, data, function() {
+			window.location = home_url;
+		});
+	});
+
+});
+
+</script>
+{% endblock %}

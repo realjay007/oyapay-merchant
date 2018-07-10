@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<header class="mt-3 mt-md-5 mb-5 d-flex justify-content-center">
+	<h2>Complete Agent Registration</h2>
+</header>
+{% endblock %}
+
+{% block content %}
+<form class="m-auto" style="max-width: 500px" method="POST" action="{{ url_for('agent.confirm', code=code) }}">
+	<div class="form-group">
+		<label for="password">Password</label>
+		<input type="password" class="form-control" id="password" name="password" placeholder="Create password" required>
+	</div>
+	<button type="submit" class="btn btn-primary btn-lg btn-block w-50 mx-auto mt-5">Submit</button>
+	<div class="text-justify mt-4">
+		<small><a href="{{ url_for('agent.login') }}" class="p-2">Login</a></small>
+	</div>
+</form>
+{% endblock %}

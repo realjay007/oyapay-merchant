@@ -10,28 +10,36 @@ class Agent(Model):
 
 	_table = "agents"
 
-	_fields = ("id", "name", "phone", "password", "confirmed", "created_at")
+	_fields = ("id", "name", "phone", "password", "confirmed", "confirm_code", "created_at")
 
 
 	def get_admins(self, accepted=None) -> list:
 		""" Get admins associated with agent,
 				set accepted to True to return only admins with accepted invites, false for non-accepted
 		"""
-		sub_select = Query.from_(admin_agent.AdminAgent._table).select("admin_id") \
+		# Get invites
+		q = Query.from_(admin_agent.AdminAgent._table).select("*") \
 			.where(Field("agent_id") == self.id)
-		
 		if accepted is not None:
-			sub_select = sub_select.where(Field("accepted") == int(accepted))
-		
+			q = q.where(Field("accepted") == int(accepted))
+
+		raw_invites = self._db.execute(q.get_sql())
+		invites = {}
+		if raw_invites is not None:
+			for raw_invite in raw_invites:
+				invites[raw_invite["admin_id"]] = admin_agent.AdminAgent(raw_invite)
+
+		# Get admins
 		q = Query.from_(admin.Admin._table).select("*") \
-			.where(Field("id").isin(sub_select))
+			.where(Field("id").isin(list(invites.keys())))
 		
 		raw_admins = self._db.execute(q.get_sql())
-		
 		admins = []
 		if raw_admins is not None:
 			for raw_admin in raw_admins:
-				admins.append(admin.Admin(raw_admin))
+				ad = admin.Admin(raw_admin)
+				ad.invite = invites[ad.id]
+				admins.append(ad)
 		
 		return admins
 	
@@ -49,6 +57,15 @@ class Agent(Model):
 		assoc = admin_agent.AdminAgent.find_many({"agent_id": self.id, "admin_id": admin_id})
 
 		return bool(assoc)
+
+
+	def count_invites(self) -> int:
+		""" Count pending invitations """
+		query = {
+			"agent_id": self.id,
+			"accepted": 0
+		}
+		return admin_agent.AdminAgent.count(query)
 
 
 	def for_json(self):

@@ -16,21 +16,66 @@
 		<tr>
 			<th>Name</th>
 			<th>Phone</th>
-			<th>Confirmed</th>
 			<th>Invited at</th>
 			<th>Actions</th>
 		</tr>
 	</thead>
 	<tbody>
+		{% for agent in agents %}
 		<tr>
-			<td>Jane Doe</td>
-			<td>08123456789</td>
-			<td>Yes</td>
-			<td>July 8, 2018 10:30am</td>
+			<td>{{ agent.name }}</td>
+			<td>{{ agent.phone }}</td>
+			<td>{{ agent.invite.invited_at }}</td>
 			<td>
-				<button class="btn btn-danger btn-sm">Remove</button>
+				<button data-agent-id="{{ agent.id }}" class="btn btn-danger btn-sm remove-agent-btn">Remove</button>
 			</td>
 		</tr>
+		{% endfor %}
 	</tbody>
 </table>
+
+<!-- Remove agent Modal -->
+<div class="modal fade" id="remove-agent" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Remove agent</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to remove agent from your list?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+        <button type="button" class="btn btn-primary" id="remove-agent-confirm">Yes</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+$(function() {
+	var del_agent_id;
+	var del_agent_modal = $("#remove-agent");
+	var del_agent_url = "{{ url_for('admin.remove_agent') }}";
+	var home_url = "{{ url_for('admin.home') }}";
+	$(".remove-agent-btn").click(function() {
+		del_agent_id = $(this).data("agent-id");
+		del_agent_modal.modal("show")
+	});
+
+	$("#remove-agent-confirm").click(function() {
+		var data = {agent_id: del_agent_id};
+		$.post(del_agent_url, data, function() {
+			window.location = home_url;
+		});
+	});
+
+});
+
+</script>
 {% endblock %}

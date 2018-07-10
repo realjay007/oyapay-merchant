@@ -21,6 +21,7 @@ class Admin(Model):
 			.where(Field("admin_id") == self.id)
 		if accepted is not None:
 			q = q.where(Field("accepted") == int(accepted))
+
 		raw_invites = self._db.execute(q.get_sql())
 		invites = {}
 		if raw_invites is not None:
@@ -28,14 +29,8 @@ class Admin(Model):
 				invites[raw_invite["agent_id"]] = admin_agent.AdminAgent(raw_invite)
 
 		# Get agents
-		sub_select = Query.from_(admin_agent.AdminAgent._table).select("agent_id") \
-			.where(Field("admin_id") == self.id)
-		
-		if accepted is not None:
-			sub_select = sub_select.where(Field("accepted") == int(accepted))
-		
 		q = Query.from_(agent.Agent._table).select("*") \
-			.where(Field("id").isin(sub_select))
+			.where(Field("id").isin(list(invites.keys())))
 		
 		raw_agents = self._db.execute(q.get_sql())
 		agents = []
@@ -48,19 +43,22 @@ class Admin(Model):
 		return agents
 	
 
-	def has_agent(ag) -> bool:
-		""" Check if admin is assoc with agent
-		
-			:param agent -> Agent model or agent id
-		"""
+	def get_invite(self, ag):
+		""" Get invite that connects agent and admin if any """
 		if isinstance(ag, agent.Agent):
 			agent_id = ag.id
 		else:
 			agent_id = ag
-		
-		assoc = admin_agent.AdminAgent.find_many({"admin_id": self.id, "agent_id": agent_id})
 
-		return bool(assoc)
+		return admin_agent.AdminAgent.find_one({"admin_id": self.id, "agent_id": agent_id})
+	
+
+	def has_agent(self, ag) -> bool:
+		""" Check if admin is assoc with agent
+		
+			:param agent -> Agent model or agent id
+		"""
+		return bool(self.get_invite())
 
 
 	def for_json(self):

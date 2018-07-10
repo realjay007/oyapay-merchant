@@ -1,5 +1,6 @@
 from ..db import get_db
 from pypika import Query, Table, Field
+from flask import current_app as app
 
 class Model:
 	""" Base model class """
@@ -65,10 +66,10 @@ class Model:
 		else:
 			# Insert operation
 			q = Query.into(self._table).columns(*keys).insert(*values)
-			cur.execute(q.get_sql())
-			self.id = cur.lastrowid
+			sql = q.get_sql()
+			cur.execute(sql)
 			# Sync to get table defaults
-			self.init_data(self.__class__.find_one(self.id).get_data())
+			self.init_data(self.__class__.find_one(cur.lastrowid).get_data())
 		self._db.commit()
 
 		return self
@@ -121,3 +122,23 @@ class Model:
 			for obj in objs:
 				result.append(cls(obj))
 		return result
+	
+
+	@classmethod
+	def count(cls, query):
+		""" Count records from db """
+		if type(query) is str or type(query) is int:
+			query = {"id": query}
+
+		q = Query.from_(cls._table).select("count(*) as num")
+
+		for key, value in query.items():
+			q = q.where(Field(key) == value)
+
+		sql = q.get_sql()
+		db = Model.init_db()
+		obj = db.execute(sql).fetchone()
+		count = 0
+		if obj is not None:
+			count = obj["num"]
+		return count
